@@ -21,12 +21,8 @@ tasks.test {
 
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
-    useK2 = true
     apiVersion = "1.7"
     languageVersion = "1.7"
-    jvmTarget = "17"
     suppressWarnings = true
-//     freeCompilerArgs += "-progressive"
-    freeCompilerArgs += "-Xjdk-release=17"
   }
 }
