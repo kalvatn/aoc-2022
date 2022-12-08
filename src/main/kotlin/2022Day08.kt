@@ -4,42 +4,58 @@ import tools.timer
 fun main() = timer {
   val input = getResourceAsText("08.txt")
 
-  val grid: List<List<Int>> = input.lines().map {
-    it.map { c -> c.digitToInt() }
-  }
+  val grid = input.lines().map { it.map { c -> c.digitToInt() } }
+  val indices = grid.indices
+  val max = indices.max()
 
-  val indicesY = grid.indices
-  val indicesX = grid[0].indices
-
-  val boundsY = Pair(indicesY.min(), indicesY.max())
-  val boundsX = Pair(indicesX.min(), indicesX.max())
-
-  val part1 = indicesY.flatMap { y ->
-    indicesX.map { x ->
-      val height = grid[y][x]
-      val visibleFromTop = (boundsY.first until y).map { grid[it][x] }.all { it < height }
-      val visibleFromBottom = (y.inc()..boundsY.second).map { grid[it][x] }.all { it < height }
-      val visibleFromLeft = (boundsX.first until x).map { grid[y][it] }.all { it < height }
-      val visibleFromRight = (x.inc()..boundsX.second).map { grid[y][it] }.all { it < height }
-
-      visibleFromLeft || visibleFromRight || visibleFromBottom || visibleFromTop
+  val heightsByCoordinate = indices.flatMap { y ->
+    indices.map { x ->
+      y to x to grid[y][x]
     }
-  }.count { it }
+  }.toMap()
+
+  val part1 = heightsByCoordinate.count { (coord, height) ->
+    val (y, x) = coord
+//    val u = (0 until y).map { grid[it][x] }.all { it < height }
+//    val d = (y.inc()..max).map { grid[it][x] }.all { it < height }
+//    val l = (0 until x).map { grid[y][it] }.all { it < height }
+//    val r = (x.inc()..max).map { grid[y][it] }.all { it < height }
+//    u || d || l || r
+    listOf(
+      mapY(grid, x, (0 until y)),
+      mapY(grid, x, (y.inc()..max)),
+      mapX(grid, y, (0 until x)),
+      mapX(grid, y, (x.inc()..max))
+    ).map { heights ->
+      heights.all { it < height }
+    }.any { it }
+  }
 
   println(part1)
   check(part1 == 1851)
 
-  val part2 = indicesY.flatMap { y ->
-    indicesX.map { x ->
-      val height = grid[y][x]
-      val u = (y.dec() downTo boundsY.first.inc()).takeWhile { grid[it][x] < height }.count().inc()
-      val d = (y.inc() until boundsY.second).takeWhile { grid[it][x] < height }.count().inc()
-      val l = (x.dec() downTo boundsX.first.inc()).takeWhile { grid[y][it] < height }.count().inc()
-      val r = (x.inc() until boundsX.second).takeWhile { grid[y][it] < height }.count().inc()
-      u * d * l * r
+  val part2 = heightsByCoordinate.maxOf { (k, height) ->
+    val (y, x) = k
+//    val u = (y.dec() downTo 1).takeWhile { grid[it][x] < height }.count().inc()
+//    val d = (y.inc() until max).takeWhile { grid[it][x] < height }.count().inc()
+//    val l = (x.dec() downTo 1).takeWhile { grid[y][it] < height }.count().inc()
+//    val r = (x.inc() until max).takeWhile { grid[y][it] < height }.count().inc()
+//    u * d * l * r
+    listOf(
+      mapY(grid, x, (y.dec() downTo 1)),
+      mapY(grid, x, (y.inc() until max)),
+      mapX(grid, y, (x.dec() downTo 1)),
+      mapX(grid, y, (x.inc() until max)),
+    ).map { heights ->
+      heights.takeWhile { it < height }.count().inc()
+    }.fold(1) { acc, score ->
+      acc * score
     }
-  }.maxOf { it }
+  }
   println(part2)
   check(part2 == 574080)
 
 }
+
+fun mapY(grid: List<List<Int>>, x: Int, range: IntProgression) = range.map { grid[it][x] }
+fun mapX(grid: List<List<Int>>, y: Int, range: IntProgression) = range.map { grid[y][it] }
