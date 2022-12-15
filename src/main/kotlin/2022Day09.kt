@@ -75,7 +75,7 @@ private fun Pair<Int, Int>.tooFar(other: Pair<Int, Int>): Boolean {
   return abs(this.first - other.first) > 1 || abs(this.second - other.second) > 1
 }
 
-private operator fun Pair<Int, Int>.plus(diff: Pair<Int, Int>): Pair<Int, Int> {
+operator fun Pair<Int, Int>.plus(diff: Pair<Int, Int>): Pair<Int, Int> {
   return Pair(this.first + diff.first, this.second + diff.second)
 }
 
