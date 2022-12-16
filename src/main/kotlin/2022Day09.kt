@@ -8,7 +8,11 @@ enum class Dir(val diff: Pair<Int, Int>) {
   U(Pair(-1, 0)),
   D(Pair(1, 0)),
   R(Pair(0, 1)),
-  L(Pair(0, -1))
+  L(Pair(0, -1));
+
+  operator fun plus(d: Dir): P2D {
+    return this.diff + d.diff
+  }
 }
 
 fun main() = timer {
