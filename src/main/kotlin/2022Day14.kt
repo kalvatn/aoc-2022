@@ -29,11 +29,11 @@ fun main() = timer {
     }.second
   }
 
-  val yMax = rockCoords.maxBy { it.first }.first
-  val xMax = rockCoords.maxBy { it.second }.second
+  val yMax = rockCoords.maxBy { it.first }.first + 2
+  val xMax = rockCoords.maxBy { it.second }.second + 500
   val grid = (0..yMax).map { y ->
     (0..xMax).map { x ->
-      if (y to x in rockCoords) '#' else '.'
+      if ((y to x in rockCoords) || y == yMax) '#' else '.'
     }.toMutableList()
   }
 
@@ -42,7 +42,7 @@ fun main() = timer {
       (grid[0].indices).map { x ->
         if (sand.first == y && sand.second == x) 'o' else grid[y][x]
       }.joinToString("")
-    }.dropLastWhile { !it.contains("o") }.map { it.drop(450) }.map {
+    }.map { it.drop(450) }.map {
       println(it)
     }
   }
@@ -54,19 +54,29 @@ fun main() = timer {
   val DL = Dir.D + Dir.L
   val D = Dir.D.diff
   var step = 0
+//  print(sand)
   while (true) {
     val tryD = sand + D
     val tryDL = sand + DL
     val tryDR = sand + DR
 
+    if(grid[sandStart.first][sandStart.second] == 'o') {
+      break
+    }
     if (tryD.first !in grid.indices) {
       break
     }
-
-    if (++step % 1000 == 0) {
-      println("step $step ${grid.sumOf { s -> s.count { it == 'o' } }}")
-      print(sand)
+    if (tryDR.first !in grid.indices || tryDR.second !in grid[0].indices) {
+      break
     }
+    if (tryDL.first !in grid.indices || tryDL.second !in grid[0].indices) {
+      break
+    }
+
+//    if (++step % 1000 == 0) {
+//      println("step $step ${grid.sumOf { s -> s.count { it == 'o' } }}")
+//      print(sand)
+//    }
 
     when {
       grid[tryD.first][tryD.second] == '.'   -> sand = tryD
@@ -78,7 +88,11 @@ fun main() = timer {
       }
     }
   }
-  print(sand)
+//  print(sand)
   val part1 = grid.sumOf { s -> s.count { it == 'o' } }
   println(part1)
+
+  // part1 == 683
+  // part2 == 28821
+
 }
